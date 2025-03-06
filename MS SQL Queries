@@ -1,0 +1,104 @@
+CREATE DATABASE IF NOT EXISTS ecommerce;
+USE ecommerce;
+CREATE TABLE Indian_summer_products(
+	Product_id money NOT NULL PRIMARY KEY,
+	Product_name nvarchar(50) NOT NULL,
+	Category nvarchar(50) NOT NULL,
+	Brand nvarchar(50) NOT NULL,
+	Average_price FLOAT NOT NULL,
+	SPF_rating tinyint NOT NULL,
+	Skin_type nvarchar(50) NOT NULL,
+	Age_group nvarchar(50) NOT NULL,
+	Gender nvarchar(50) NOT NULL,
+	Popularity_rating tinyint NOT NULL,
+	Usage_frequent nvarchar(50) NOT NULL,
+	Primary_Ingredient nvarchar(50) NOT NULL,
+	Organic bit NOT NULL,
+	Paraben_free bit NOT NULL,
+	Region_usage nvarchar(50) NOT NULL,
+	Online_availability nvarchar(50) NOT NULL
+);
+-- Select only the Product_Name, Category, and Average_Price of products.
+SELECT product_name, category, average_price
+FROM indian_summer_products;
+
+-- Find all products that belong to the "Skincare" or “Makeup” category.
+SELECT * FROM indian_summer_products
+WHERE Category IN ('skincare', 'makeup');
+
+-- Retrieve all products with an SPF_Rating greater than 30.
+SELECT * FROM indian_summer_products
+WHERE SPF_Rating >30;
+
+-- List distinct Skin_Types available in the table.
+SELECT DISTINCT skin_type FROM indian_summer_products;
+ 
+-- Retrieve all Organic products sorted by Popularity_Rating in descending order.
+SELECT * FROM indian_summer_products
+WHERE organic=1
+ORDER BY Popularity_Rating desc;
+ 
+-- Get all Paraben_Free products that are available on any online platform (Amazon, Nykaa, Myntra).
+SELECT * FROM indian_summer_products
+WHERE PARABEN_FREE = 1 AND online_availability IN ('Amazon', 'nykaa', 'myntra’);
+ 
+-- Find all products that have an Average_Price between 500 and 1000.
+SELECT * FROM indian_summer_products
+WHERE Average_Price BETWEEN 500 AND 1000;
+
+ -- Display products used in the "South" region and order them by Usage_Frequency.
+SELECT * FROM indian_summer_products
+WHERE Region_usage = 'south'
+ORDER BY usage_frequency;
+
+-- Retrieve products used by females and sorted by Age_Group.
+SELECT * FROM indian_summer_products
+WHERE gender = 'female'
+ORDER BY age_group;
+
+-- Find the average price of all Garnier products.
+SELECT brand, AVG(average_price) AS avg_price FROM indian_summer_products
+WHERE brand = 'garnier'
+GROUP BY brand;
+
+-- Count the number of products available for "Oily" skin.
+SELECT skin_type, COUNT(*) AS available_products FROM indian_summer_products
+WHERE skin_type = 'Oily'
+GROUP BY skin_type;
+
+-- Get the highest Popularity_Rating for each Brand.
+SELECT Brand, MAX(popularity_rating) AS highest_popularity_rating 
+FROM indian_summer_products
+GROUP BY brand;
+
+-- Find out how many products are Organic and how many are Non-Organic.
+SELECT Organic, COUNT(*) AS no_of_products FROM indian_summer_products
+GROUP BY organic;
+
+-- Display the total number of products in each Age_Group.
+SELECT Age_group, COUNT(*) AS no_of_products FROM indian_summer_products
+GROUP BY Age_group;
+
+-- Join the SummerProducts table with ProductReviews and get products with an average Review_Score above 4.5.
+SELECT p.product_id, p.product_name, AVG(r.review_score) AS avg_review_score FROM indian_summer_products p
+JOIN ProductReviews r ON p.product_id = r.product_id
+GROUP BY p.Product_ID, p.product_name
+HAVING AVG(r.review_score) > 4.5;
+
+-- Find all products that have never been reviewed.
+SELECT p.Product_ID, p.product_name FROM indian_summer_products p
+LEFT JOIN productreviews r ON p.product_id = r.product_id
+WHERE r.Product_ID IS NULL;
+
+-- Retrieve all products whose Average_Price is higher than the average price of all products.
+SELECT * FROM indian_summer_products
+WHERE average_price > (SELECT AVG(average_price) AS avg_price FROM indian_summer_products);
+
+-- Find the product with the highest SPF_Rating.
+SELECT TOP 1 product_id, product_name, SPF_rating FROM indian_summer_products
+ORDER BY SPF_rating DESC;
+
+-- Get products that have the second highest Popularity_Rating.
+SELECT MAX(popularity_rating) second_highest_popularity_rating FROM indian_summer_products
+WHERE popularity_rating < (SELECT MAX(popularity_rating) FROM indian_summer_products);
+
